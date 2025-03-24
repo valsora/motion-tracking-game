@@ -114,6 +114,59 @@ const MPStart = () => {
       })
     }
 
+    function processTraining(results: Results) {
+      if (trainingRef.current.level === 1 && unfoldWingsPose(results)) {
+        trainingRef.current.level += 0.5
+        setTrainingMessage('take a neutral pose')
+        console.log('unfoldWingsPose')
+      }
+      if (trainingRef.current.level === 1.5 && idlePose(results)) {
+        trainingRef.current.level += 0.5
+        setTrainingMessage('show "move ahead" gesture')
+        console.log('idlePose')
+      }
+      if (trainingRef.current.level === 2 && moveAheadPose(results)) {
+        trainingRef.current.level += 0.5
+        setTrainingMessage('take a neutral pose')
+        console.log('moveAheadPose')
+      }
+    }
+
+    function processNotTraining(results: Results) {
+      function processPose(
+        results: Results,
+        poseName: string,
+        posePredicate: (results: Results) => boolean,
+      ): boolean {
+        if (posePredicate(results)) {
+          if (notTrainingRef.current.pose === poseName)
+            notTrainingRef.current.count += 1
+          else notTrainingRef.current.count = 0
+          notTrainingRef.current.pose = poseName
+          console.log(`${poseName} ${notTrainingRef.current.count}`)
+          return true
+        }
+        return false
+      }
+
+      processPose(results, 'idle', idlePose)
+      const unfoldWingsIsDetected = processPose(
+        results,
+        'unfoldWings',
+        unfoldWingsPose,
+      )
+      if (!unfoldWingsIsDetected) {
+        processPose(results, 'moveAhead', moveAheadPose)
+      }
+
+      if (notTrainingRef.current.count >= 20) {
+        console.log('aaaaa eto ' + notTrainingRef.current.pose)
+        notTrainingRef.current.count = 0
+        if (notTrainingRef.current.pose)
+          setNotTrainingMessage(notTrainingRef.current.pose)
+      }
+    }
+
     if (
       results.poseLandmarks &&
       results.rightHandLandmarks &&
@@ -121,53 +174,10 @@ const MPStart = () => {
     ) {
       setIsEverythingSeen(true)
       if (gameModeRef.current === 'Training') {
-        if (trainingRef.current.level === 1 && unfoldWingsPose(results)) {
-          trainingRef.current.level += 0.5
-          setTrainingMessage('take a neutral pose')
-          console.log('unfoldWingsPose')
-        }
-        if (trainingRef.current.level === 1.5 && idlePose(results)) {
-          trainingRef.current.level += 0.5
-          setTrainingMessage('show "move ahead" gesture')
-          console.log('idlePose')
-        }
-        if (trainingRef.current.level === 2 && moveAheadPose(results)) {
-          trainingRef.current.level += 0.5
-          setTrainingMessage('take a neutral pose')
-          console.log('moveAheadPose')
-        }
+        processTraining(results)
       }
       if (gameModeRef.current === 'Not training') {
-        if (idlePose(results)) {
-          if (notTrainingRef.current.pose === 'idle')
-            notTrainingRef.current.count += 1
-          else notTrainingRef.current.count = 0
-          notTrainingRef.current.pose = 'idle'
-          console.log('idlePose ' + notTrainingRef.current.count)
-        }
-        if (unfoldWingsPose(results)) {
-          if (notTrainingRef.current.pose === 'unfoldWings')
-            notTrainingRef.current.count += 1
-          else notTrainingRef.current.count = 0
-          notTrainingRef.current.pose = 'unfoldWings'
-          console.log('unfoldWings ' + notTrainingRef.current.count)
-        } else {
-          //else, because moveAheadPose usually include unfoldWingsPose
-          if (moveAheadPose(results)) {
-            if (notTrainingRef.current.pose === 'moveAhead')
-              notTrainingRef.current.count += 1
-            else notTrainingRef.current.count = 0
-            notTrainingRef.current.pose = 'moveAhead'
-            console.log('moveAhead ' + notTrainingRef.current.count)
-          }
-        }
-
-        if (notTrainingRef.current.count >= 20) {
-          console.log('aaaaa eto ' + notTrainingRef.current.pose)
-          notTrainingRef.current.count = 0
-          if (notTrainingRef.current.pose)
-            setNotTrainingMessage(notTrainingRef.current.pose)
-        }
+        processNotTraining(results)
       }
     } else {
       setIsEverythingSeen(false)
@@ -194,18 +204,18 @@ const MPStart = () => {
       <div className={styles.message}>
         {gameModeTitle === 'Training' ? trainingMessage : notTrainingMessage}
       </div>
-      <canvas
-        className={styles.canvas}
-        style={{ borderColor: isEverythingSeen ? 'green' : 'red' }}
-        ref={canvasRef}
-      >
-        <Webcam audio={false} mirrored ref={webcamRef} />
-      </canvas>
       {gameModeTitle === 'Training' && (
         <button className={styles.button} onClick={restartTraining}>
           RESTART
         </button>
       )}
+      <canvas
+        className={styles.canvas}
+        style={{ borderColor: isEverythingSeen ? 'green' : 'red' }}
+        ref={canvasRef}
+      >
+        <Webcam audio={false} ref={webcamRef} />
+      </canvas>
     </div>
   )
 }
