@@ -4,28 +4,22 @@ import roundValue from './roundValue'
 
 export const moveAheadPose = ({
   poseLandmarks,
-  //rightHandLandmarks,
-  //leftHandLandmarks,
-}: Results): boolean => {
-  const nose_y = poseLandmarks[POSE_LANDMARKS.NOSE].y
+}: Pick<Results, 'poseLandmarks'>): boolean => {
+  const nose = poseLandmarks[POSE_LANDMARKS.NOSE]
 
-  const _shoulderR_y = roundValue(
-    poseLandmarks[POSE_LANDMARKS.RIGHT_SHOULDER].y,
-  )
-  //const elbowR_x = poseLandmarks[POSE_LANDMARKS.RIGHT_ELBOW].x
-  const elbowR_y = poseLandmarks[POSE_LANDMARKS.RIGHT_ELBOW].y
-  const _elbowR_y = roundValue(elbowR_y)
-  const wristR_y = poseLandmarks[POSE_LANDMARKS.RIGHT_WRIST].y
+  const shoulderR = poseLandmarks[POSE_LANDMARKS.RIGHT_SHOULDER]
+  const elbowR = poseLandmarks[POSE_LANDMARKS.RIGHT_ELBOW]
+  const wristR = poseLandmarks[POSE_LANDMARKS.RIGHT_WRIST]
 
-  const _shoulderL_y = roundValue(poseLandmarks[POSE_LANDMARKS.LEFT_SHOULDER].y)
-  //const elbowL_x = poseLandmarks[POSE_LANDMARKS.LEFT_ELBOW].x
-  const elbowL_y = poseLandmarks[POSE_LANDMARKS.LEFT_ELBOW].y
-  const _elbowL_y = roundValue(elbowL_y)
-  const wristL_y = poseLandmarks[POSE_LANDMARKS.LEFT_WRIST].y
+  const shoulderL = poseLandmarks[POSE_LANDMARKS.LEFT_SHOULDER]
+  const elbowL = poseLandmarks[POSE_LANDMARKS.LEFT_ELBOW]
+  const wristL = poseLandmarks[POSE_LANDMARKS.LEFT_WRIST]
 
-  const rightSide = wristR_y < nose_y && _shoulderR_y === _elbowR_y
+  const rightSide =
+    wristR.y < nose.y && roundValue(shoulderR.y) === roundValue(elbowR.y)
 
-  const leftSide = wristL_y < nose_y && _shoulderL_y === _elbowL_y
+  const leftSide =
+    wristL.y < nose.y && roundValue(shoulderL.y) === roundValue(elbowL.y)
 
   return rightSide && leftSide
 }

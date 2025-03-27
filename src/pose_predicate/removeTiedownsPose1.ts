@@ -2,28 +2,20 @@ import { POSE_LANDMARKS, Results } from '@mediapipe/holistic'
 
 import roundValue from './roundValue'
 
-export const idlePose = ({
+export const removeTiedownsPose1 = ({
   poseLandmarks,
 }: Pick<Results, 'poseLandmarks'>): boolean => {
   const shoulderR = poseLandmarks[POSE_LANDMARKS.RIGHT_SHOULDER]
   const elbowR = poseLandmarks[POSE_LANDMARKS.RIGHT_ELBOW]
   const wristR = poseLandmarks[POSE_LANDMARKS.RIGHT_WRIST]
 
-  const shoulderL = poseLandmarks[POSE_LANDMARKS.LEFT_SHOULDER]
-  const elbowL = poseLandmarks[POSE_LANDMARKS.LEFT_ELBOW]
   const wristL = poseLandmarks[POSE_LANDMARKS.LEFT_WRIST]
 
   const rightSide =
-    roundValue(shoulderR.x) === roundValue(elbowR.x) &&
-    roundValue(shoulderR.x) === roundValue(wristR.x) &&
+    roundValue(wristL.x) === roundValue(shoulderR.x) &&
+    roundValue(wristL.y) === roundValue(shoulderR.y) &&
     shoulderR.y < elbowR.y &&
     elbowR.y < wristR.y
 
-  const leftSide =
-    roundValue(shoulderL.x) === roundValue(elbowL.x) &&
-    roundValue(shoulderL.x) === roundValue(wristL.x) &&
-    shoulderL.y < elbowL.y &&
-    elbowL.y < wristL.y
-
-  return rightSide && leftSide
+  return rightSide
 }

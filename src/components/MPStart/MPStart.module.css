@@ -5,7 +5,6 @@
 }
 
 .message {
-  margin-bottom: 8px;
   text-align: center;
   font-size: 32px;
   font-weight: 500;
@@ -14,12 +13,9 @@
 .canvas {
   width: 640px;
   height: 480px;
-  border-width: 1.2px;
-  border-style: solid;
   transform: scaleX(-1);
 }
 
-.button {
-  display: block;
-  font-size: 16px;
+.image {
+  height: 480px;
 }
