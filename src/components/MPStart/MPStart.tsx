@@ -10,14 +10,26 @@ import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils'
 import { Camera } from '@mediapipe/camera_utils'
 
 import styles from './MPStart.module.css'
-import idleImg from '../../images/idle.png'
-import unfoldWingsImg from '../../images/unfoldWings.png'
-import removeTiedownsImg from '../../images/removeTiedowns.png'
+import ImageOfPose from '../ImageOfPose/ImageOfPose'
 import {
   idlePose,
   removeTiedownsPose1,
-  unfoldWingsPose,
+  removeTiedownsPose2,
+  removeTiedownsPose3,
+  removeTiedownsPose4,
+  tiedownsRemovedPose1,
+  tiedownsRemovedPose2,
+  tiedownsRemovedPose3,
+  tiedownsRemovedPose4,
+  wheelChocksRemovedPose,
   moveAheadPose,
+  turnRightPose,
+  turnLeftPose,
+  stopPose,
+  unfoldWingsPose1,
+  unfoldWingsPose2,
+  launchBarPose1,
+  launchBarPose2,
 } from '../../pose_predicate'
 import {
   TRAINING_GAME_MODE,
@@ -148,11 +160,34 @@ const MPStart = () => {
       function processTraining(results: Results) {
         goToNextLevelFrom(0, idlePose)
         goToNextLevelFrom(1, removeTiedownsPose1)
-        goToNextLevelFrom(2, idlePose)
-        goToNextLevelFrom(3, unfoldWingsPose)
-        goToNextLevelFrom(4, idlePose)
-        goToNextLevelFrom(5, moveAheadPose)
-        goToNextLevelFrom(6, idlePose)
+        goToNextLevelFrom(2, removeTiedownsPose2)
+        goToNextLevelFrom(3, removeTiedownsPose3)
+        goToNextLevelFrom(4, removeTiedownsPose4)
+        goToNextLevelFrom(5, idlePose)
+        goToNextLevelFrom(6, tiedownsRemovedPose1)
+        goToNextLevelFrom(7, tiedownsRemovedPose2)
+        goToNextLevelFrom(8, tiedownsRemovedPose3)
+        goToNextLevelFrom(9, tiedownsRemovedPose4)
+        goToNextLevelFrom(10, idlePose)
+        goToNextLevelFrom(11, wheelChocksRemovedPose)
+        goToNextLevelFrom(12, idlePose)
+        goToNextLevelFrom(13, moveAheadPose)
+        goToNextLevelFrom(14, idlePose)
+        goToNextLevelFrom(15, turnRightPose)
+        goToNextLevelFrom(16, idlePose)
+        goToNextLevelFrom(17, turnLeftPose)
+        goToNextLevelFrom(18, idlePose)
+        goToNextLevelFrom(19, stopPose)
+        goToNextLevelFrom(20, idlePose)
+        goToNextLevelFrom(21, unfoldWingsPose1)
+        goToNextLevelFrom(22, unfoldWingsPose2)
+        goToNextLevelFrom(23, idlePose)
+        goToNextLevelFrom(24, launchBarPose1)
+        goToNextLevelFrom(25, launchBarPose2)
+        goToNextLevelFrom(26, idlePose)
+        goToNextLevelFrom(27, launchBarPose2)
+        goToNextLevelFrom(28, launchBarPose1)
+        goToNextLevelFrom(29, idlePose)
         function goToNextLevelFrom(
           fromLevel: number,
           posePredicate: (results: Results) => boolean,
@@ -184,8 +219,8 @@ const MPStart = () => {
         processPose(results, 'idle', idlePose)
         const unfoldWingsIsDetected = processPose(
           results,
-          'unfoldWings',
-          unfoldWingsPose,
+          'wheelChocksRemoved',
+          wheelChocksRemovedPose,
         )
         if (!unfoldWingsIsDetected) {
           processPose(results, 'moveAhead', moveAheadPose)
@@ -230,18 +265,6 @@ const MPStart = () => {
     dispatch(restart())
   }
 
-  interface ImageBasedOnLevel {
-    [index: number]: string
-  }
-
-  const imageBasedOnLevel: ImageBasedOnLevel = {
-    0: idleImg,
-    1: removeTiedownsImg,
-    2: idleImg,
-    3: unfoldWingsImg,
-    4: idleImg,
-  }
-
   return (
     <div className={styles.mpstart}>
       <h1>{gameMode}</h1>
@@ -264,11 +287,7 @@ const MPStart = () => {
         >
           <Webcam audio={false} ref={webcamRef} />
         </canvas>
-        <img
-          className={styles.image}
-          src={imageBasedOnLevel[level]}
-          alt="pose"
-        />
+        {gameMode === TRAINING_GAME_MODE && <ImageOfPose />}
       </div>
     </div>
   )

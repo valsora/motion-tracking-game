@@ -1,15 +1,50 @@
 import { createSlice } from '@reduxjs/toolkit'
 //import type { PayloadAction } from '@reduxjs/toolkit'
 
-const messages: string[] = [
-  'adopt an idle pose to start',
-  '1. show "remove tiedowns" gesture',
-  'adopt an idle pose to go to next level',
-  '2. show "unfold wings" gesture',
-  'adopt an idle pose to go to next level',
-  '3. show "move ahead" gesture',
-  'adopt an idle pose to finish',
-  'training finished',
+import idleImage from '../../images/idle.png'
+import removeTiedownsImage from '../../images/removeTiedowns.png'
+import wheelChocksRemovedImage from '../../images/wheelChocksRemoved.png'
+import moveAheadImage from '../../images/moveAhead.png'
+import turnRightImage from '../../images/turnRight.png'
+import turnLeftImage from '../../images/turnLeft.png'
+import stopImage from '../../images/stop.png'
+import unfoldWings1Image from '../../images/unfoldWings1.png'
+import unfoldWings2Image from '../../images/unfoldWings2.png'
+import launchBar1Image from '../../images/launchBar1.png'
+import launchBar2Image from '../../images/launchBar2.png'
+
+export const levelsData: [string, string | undefined][] = [
+  ['adopt an idle pose to start', idleImage],
+  ['1.1 show "remove tiedowns" signal', removeTiedownsImage],
+  ['1.2 show "remove tiedowns" signal', removeTiedownsImage],
+  ['1.3 show "remove tiedowns" signal', removeTiedownsImage],
+  ['1.4 show "remove tiedowns" signal', removeTiedownsImage],
+  ['adopt an idle pose to go to next level', idleImage],
+  ['2.1 show "tiedowns removed" signal', undefined],
+  ['2.2 show "tiedowns removed" signal', undefined],
+  ['2.3 show "tiedowns removed" signal', undefined],
+  ['2.4 show "tiedowns removed" signal', undefined],
+  ['adopt an idle pose to go to next level', idleImage],
+  ['3. show "wheel chocks removed" signal', wheelChocksRemovedImage],
+  ['adopt an idle pose to go to next level', idleImage],
+  ['4. show "move ahead" signal', moveAheadImage],
+  ['adopt an idle pose to go to next level', idleImage],
+  ['5. show "turn right" signal', turnRightImage],
+  ['adopt an idle pose to go to next level', idleImage],
+  ['6. show "turn left" signal', turnLeftImage],
+  ['adopt an idle pose to go to next level', idleImage],
+  ['7. show "stop" signal', stopImage],
+  ['adopt an idle pose to go to next level', idleImage],
+  ['8.1 show "unfold wings" signal', unfoldWings1Image],
+  ['8.2 show "unfold wings" signal', unfoldWings2Image],
+  ['adopt an idle pose to go to next level', idleImage],
+  ['9.1 show "extend launch bar" signal', launchBar1Image],
+  ['9.2 show "extend launch bar" signal', launchBar2Image],
+  ['adopt an idle pose to go to next level', idleImage],
+  ['10.1 show "retract launch bar" signal', launchBar2Image],
+  ['10.2 show "retract launch bar" signal', launchBar1Image],
+  ['adopt an idle pose to finish', idleImage],
+  ['training finished', undefined],
 ]
 
 interface TrainingModeState {
@@ -19,7 +54,7 @@ interface TrainingModeState {
 
 const initialState: TrainingModeState = {
   level: 0,
-  trainingMessage: messages[0],
+  trainingMessage: levelsData[0][0],
 }
 
 export const trainingModeSlice = createSlice({
@@ -29,11 +64,11 @@ export const trainingModeSlice = createSlice({
     toNextLevel: (state) => {
       const nextLevel = state.level + 1
       state.level = nextLevel
-      state.trainingMessage = messages[nextLevel]
+      state.trainingMessage = levelsData[nextLevel][0]
     },
     restart: (state) => {
       state.level = 0
-      state.trainingMessage = messages[0]
+      state.trainingMessage = levelsData[0][0]
     },
   },
 })

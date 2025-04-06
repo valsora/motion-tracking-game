@@ -1,8 +1,8 @@
 import { POSE_LANDMARKS, Results } from '@mediapipe/holistic'
 
-import roundValue from './roundValue'
+import areCoordClose from './areCoordsClose'
 
-export const unfoldWingsPose = ({
+export const wheelChocksRemovedPose = ({
   poseLandmarks,
   rightHandLandmarks,
   leftHandLandmarks,
@@ -44,7 +44,7 @@ export const unfoldWingsPose = ({
     wristR.y < nose.y &&
     shoulderR.x > elbowR.x &&
     elbowR.x > thumbTipR.x &&
-    roundValue(elbowR.x) === roundValue(wristR.x) &&
+    areCoordClose(elbowR.x, wristR.x) &&
     indexMcpR.y < indexTipR.y &&
     middleMcpR.y < middleTipR.y &&
     ringMcpR.y < ringTipR.y &&
@@ -54,7 +54,7 @@ export const unfoldWingsPose = ({
     wristL.y < nose.y &&
     elbowL.x > shoulderL.x &&
     thumbTipL.x > elbowL.x &&
-    roundValue(elbowL.x) === roundValue(wristL.x) &&
+    areCoordClose(elbowL.x, wristL.x) &&
     indexMcpL.y < indexTipL.y &&
     middleMcpL.y < middleTipL.y &&
     ringMcpL.y < ringTipL.y &&
