@@ -5,7 +5,11 @@ const ImageOfPose = () => {
   const level = useStoreSelector((state) => state.trainingMode.level)
 
   return (
-    <img src={levelsData[level][1]} alt="pose" style={{ height: '480px' }} />
+    <img
+      src={levelsData[level][1]}
+      alt="pose"
+      style={{ height: '480px', transform: '1s' }}
+    />
   )
 }
 

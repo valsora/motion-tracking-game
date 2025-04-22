@@ -30,6 +30,8 @@ import {
   unfoldWingsPose2,
   launchBarPose1,
   launchBarPose2,
+  enginesRunUpPose,
+  launchPose,
 } from '../../pose_predicate'
 import {
   TRAINING_GAME_MODE,
@@ -188,6 +190,10 @@ const MPStart = () => {
         goToNextLevelFrom(27, launchBarPose2)
         goToNextLevelFrom(28, launchBarPose1)
         goToNextLevelFrom(29, idlePose)
+        goToNextLevelFrom(30, enginesRunUpPose)
+        goToNextLevelFrom(31, idlePose)
+        goToNextLevelFrom(32, launchPose)
+        goToNextLevelFrom(33, idlePose)
         function goToNextLevelFrom(
           fromLevel: number,
           posePredicate: (results: Results) => boolean,

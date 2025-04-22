@@ -67,7 +67,7 @@ export const unfoldWingsPose2 = ({
   return (
     onHorizLine &&
     orderOnXAxis &&
-    (wristL.x - shoulderL.x) * 640 * 1.1 >= (hipL.y - shoulderL.y) * 480 &&
-    (shoulderR.x - wristR.x) * 640 * 1.1 >= (hipR.y - shoulderR.y) * 480
+    (wristL.x - shoulderL.x) * 4 * 1.1 >= (hipL.y - shoulderL.y) * 3 &&
+    (shoulderR.x - wristR.x) * 4 * 1.1 >= (hipR.y - shoulderR.y) * 3
   )
 }
