@@ -10,7 +10,7 @@ import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils'
 import { Camera } from '@mediapipe/camera_utils'
 
 import styles from './MPStart.module.css'
-import ImageOfPose from '../ImageOfPose/ImageOfPose'
+import ImageOfPose from 'components/ImageOfPose/ImageOfPose'
 import {
   idlePose,
   removeTiedownsPose1,
@@ -32,14 +32,14 @@ import {
   launchBarPose2,
   enginesRunUpPose,
   launchPose,
-} from '../../pose_predicate'
+} from 'pose_predicate'
 import {
   TRAINING_GAME_MODE,
   NOT_TRAINING_GAME_MODE,
-} from '../../store/slices/gameLogicSlice'
-import { changeGameMode } from '../../store/slices/gameLogicSlice'
-import { toNextLevel, restart } from '../../store/slices/trainingModeSlice'
-import { useStoreDispatch, useStoreSelector } from '../../store/hooks'
+} from 'store/slices/gameLogicSlice'
+import { changeGameMode } from 'store/slices/gameLogicSlice'
+import { toNextLevel, restart } from 'store/slices/trainingModeSlice'
+import { useStoreDispatch, useStoreSelector } from 'store/hooks'
 
 const MPStart = () => {
   const webcamRef = useRef<Webcam>(null)

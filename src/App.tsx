@@ -1,5 +1,5 @@
 import './App.css'
-import MPStart from './components/MPStart/MPStart'
+import MPStart from 'components/MPStart/MPStart'
 
 function App() {
   return <MPStart />

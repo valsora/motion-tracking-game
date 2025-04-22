@@ -1,5 +1,5 @@
-import { useStoreSelector } from '../../store/hooks'
-import { levelsData } from '../../store/slices/trainingModeSlice'
+import { useStoreSelector } from 'store/hooks'
+import { levelsData } from 'store/slices/trainingModeSlice'
 
 const ImageOfPose = () => {
   const level = useStoreSelector((state) => state.trainingMode.level)
