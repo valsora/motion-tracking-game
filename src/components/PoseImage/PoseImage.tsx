@@ -1,7 +1,7 @@
 import { useStoreSelector } from 'store/hooks'
 import { levelsData } from 'store/slices/trainingModeSlice'
 
-const ImageOfPose = () => {
+const PoseImage = () => {
   const level = useStoreSelector((state) => state.trainingMode.level)
 
   return (
@@ -13,4 +13,4 @@ const ImageOfPose = () => {
   )
 }
 
-export default ImageOfPose
+export default PoseImage
