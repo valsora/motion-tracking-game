@@ -30,11 +30,10 @@ import {
   launchBarPose2,
   enginesRunUpPose,
   launchPose,
-} from '@/pose_predicate'
+} from '@/pose_predicates'
 
-import { TRAINING_GAME_MODE, NOT_TRAINING_GAME_MODE } from '@store/slices/gameLogicSlice'
-import { changeGameMode } from '@store/slices/gameLogicSlice'
-import { toNextLevel, restart } from '@store/slices/trainingModeSlice'
+import { TRAINING_GAME_MODE, NOT_TRAINING_GAME_MODE, changeGameMode } from '@store/slices/gameLogicSlice'
+import { toNextLevel, restart, levelsData } from '@store/slices/trainingModeSlice'
 import { useStoreDispatch, useStoreSelector } from '@store/hooks'
 
 const MPStart = () => {
@@ -44,6 +43,7 @@ const MPStart = () => {
   const [wholePoseDetected, setWholePoseDetected] = useState(false)
 
   const dispatch = useStoreDispatch()
+
   const gameMode = useStoreSelector((state) => state.gameLogic.gameMode)
 
   const { level, trainingMessage } = useStoreSelector((state) => state.trainingMode)
@@ -95,7 +95,7 @@ const MPStart = () => {
   useEffect(setupMediapipeSolution, [])
 
   function registerHolisticResultListener() {
-    if (holisticRef.current) holisticRef.current.onResults(cachedOnNewFrame)
+    holisticRef.current?.onResults(cachedOnNewFrame)
   }
 
   const cachedOnNewFrame = useCallback(onNewFrame, [dispatch, gameMode, level])
@@ -115,52 +115,19 @@ const MPStart = () => {
     canvasCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
     canvasCtx.drawImage(results.image, 0, 0, canvasRef.current.width, canvasRef.current.height)
 
-    if (poseDetected(results)) drawEstimatedPose(canvasCtx, results)
+    if (bodyDetected(results)) drawEstimatedPose(canvasCtx, results)
 
-    function processTraining(results: Results) {
-      goToNextLevelFrom(0, idlePose)
-      goToNextLevelFrom(1, removeTiedownsPose1)
-      goToNextLevelFrom(2, removeTiedownsPose2)
-      goToNextLevelFrom(3, removeTiedownsPose3)
-      goToNextLevelFrom(4, removeTiedownsPose4)
-      goToNextLevelFrom(5, idlePose)
-      goToNextLevelFrom(6, tiedownsRemovedPose1)
-      goToNextLevelFrom(7, tiedownsRemovedPose2)
-      goToNextLevelFrom(8, tiedownsRemovedPose3)
-      goToNextLevelFrom(9, tiedownsRemovedPose4)
-      goToNextLevelFrom(10, idlePose)
-      goToNextLevelFrom(11, wheelChocksRemovedPose)
-      goToNextLevelFrom(12, idlePose)
-      goToNextLevelFrom(13, moveAheadPose)
-      goToNextLevelFrom(14, idlePose)
-      goToNextLevelFrom(15, turnRightPose)
-      goToNextLevelFrom(16, idlePose)
-      goToNextLevelFrom(17, turnLeftPose)
-      goToNextLevelFrom(18, idlePose)
-      goToNextLevelFrom(19, stopPose)
-      goToNextLevelFrom(20, idlePose)
-      goToNextLevelFrom(21, unfoldWingsPose1)
-      goToNextLevelFrom(22, unfoldWingsPose2)
-      goToNextLevelFrom(23, idlePose)
-      goToNextLevelFrom(24, launchBarPose1)
-      goToNextLevelFrom(25, launchBarPose2)
-      goToNextLevelFrom(26, idlePose)
-      goToNextLevelFrom(27, launchBarPose2)
-      goToNextLevelFrom(28, launchBarPose1)
-      goToNextLevelFrom(29, idlePose)
-      goToNextLevelFrom(30, enginesRunUpPose)
-      goToNextLevelFrom(31, idlePose)
-      goToNextLevelFrom(32, launchPose)
-      goToNextLevelFrom(33, idlePose)
-      function goToNextLevelFrom(fromLevel: number, posePredicate: (results: Results) => boolean) {
-        if (level === fromLevel && posePredicate(results)) {
-          dispatch(toNextLevel())
-          return
-        }
+    function proceedTraining() {
+      function nextLevelIfPoseAtLevel(atLevel: number, poseDetected: (results: Results) => boolean) {
+        if (level === atLevel && poseDetected(results)) dispatch(toNextLevel())
       }
+
+      levelsData.forEach((levelData) => {
+        if (levelData[3]) nextLevelIfPoseAtLevel(levelData[0], levelData[3])
+      })
     }
 
-    function processNotTraining(results: Results) {
+    function processNotTraining() {
       function processPose(results: Results, poseName: string, posePredicate: (results: Results) => boolean): boolean {
         if (posePredicate(results)) {
           if (notTrainingRef.current.pose === poseName) notTrainingRef.current.count += 1
@@ -185,14 +152,15 @@ const MPStart = () => {
       }
     }
 
-    if (poseDetected(results)) {
+    if (bodyDetected(results) && atLeastOneHandDetected(results)) {
       setWholePoseDetected(true)
+
       switch (gameMode) {
         case TRAINING_GAME_MODE:
-          processTraining(results)
+          proceedTraining()
           break
         case NOT_TRAINING_GAME_MODE:
-          processNotTraining(results)
+          processNotTraining()
           break
       }
     } else {
@@ -208,6 +176,7 @@ const MPStart = () => {
         color: 'white',
         lineWidth: 3,
       })
+
       drawLandmarks(canvasCtx, results.poseLandmarks, {
         color: 'black',
         fillColor: 'rgb(225, 255, 0)',
@@ -216,13 +185,16 @@ const MPStart = () => {
     }
 
     function drawHand(handLandmarks: NormalizedLandmarkList) {
+      if (!handLandmarks) return
+
       const isLeft = handLandmarks === results.leftHandLandmarks
 
-      drawConnectors(canvasCtx, isLeft ? results.leftHandLandmarks : results.rightHandLandmarks, HAND_CONNECTIONS, {
+      drawConnectors(canvasCtx, handLandmarks, HAND_CONNECTIONS, {
         color: isLeft ? 'rgb(255, 85, 85)' : 'rgb(76, 85, 255)',
         lineWidth: 2.5,
       })
-      drawLandmarks(canvasCtx, isLeft ? results.leftHandLandmarks : results.rightHandLandmarks, {
+
+      drawLandmarks(canvasCtx, handLandmarks, {
         color: 'white',
         fillColor: isLeft ? 'red' : 'blue',
         lineWidth: 1,
@@ -235,8 +207,12 @@ const MPStart = () => {
     drawHand(results.rightHandLandmarks)
   }
 
-  function poseDetected(results: Results) {
-    return results.poseLandmarks && (results.rightHandLandmarks || results.leftHandLandmarks)
+  function bodyDetected(results: Results) {
+    return results.poseLandmarks
+  }
+
+  function atLeastOneHandDetected(results: Results) {
+    return results.rightHandLandmarks || results.leftHandLandmarks
   }
 
   useEffect(registerHolisticResultListener, [cachedOnNewFrame])
