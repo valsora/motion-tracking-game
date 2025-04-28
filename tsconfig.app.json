@@ -25,7 +25,9 @@
     "baseUrl": "./src",
     "paths": {
       "@/*": ["./*"],
-      "@store/*": ["./store/*"],
+      "@store/*": ["store/*"],
+      "@images/*": ["images/*"],
+      "@components/*": ["components/*"],
     }
   },
   "include": ["src"]

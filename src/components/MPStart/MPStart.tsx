@@ -1,13 +1,13 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import Webcam from 'react-webcam'
 
-import { Holistic, Results, POSE_CONNECTIONS, HAND_CONNECTIONS } from '@mediapipe/holistic'
+import { Holistic, Results, POSE_CONNECTIONS, HAND_CONNECTIONS, NormalizedLandmarkList } from '@mediapipe/holistic'
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils'
 import { Camera } from '@mediapipe/camera_utils'
 
 import styles from './MPStart.module.css'
 
-import PoseImage from 'components/PoseImage/PoseImage'
+import PoseImage from '@components/PoseImage/PoseImage'
 
 import {
   idlePose,
@@ -30,12 +30,12 @@ import {
   launchBarPose2,
   enginesRunUpPose,
   launchPose,
-} from 'pose_predicate'
+} from '@/pose_predicate'
 
-import { TRAINING_GAME_MODE, NOT_TRAINING_GAME_MODE } from 'store/slices/gameLogicSlice'
-import { changeGameMode } from 'store/slices/gameLogicSlice'
-import { toNextLevel, restart } from 'store/slices/trainingModeSlice'
-import { useStoreDispatch, useStoreSelector } from 'store/hooks'
+import { TRAINING_GAME_MODE, NOT_TRAINING_GAME_MODE } from '@store/slices/gameLogicSlice'
+import { changeGameMode } from '@store/slices/gameLogicSlice'
+import { toNextLevel, restart } from '@store/slices/trainingModeSlice'
+import { useStoreDispatch, useStoreSelector } from '@store/hooks'
 
 const MPStart = () => {
   const webcamRef = useRef<Webcam>(null)
@@ -115,7 +115,7 @@ const MPStart = () => {
     canvasCtx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
     canvasCtx.drawImage(results.image, 0, 0, canvasRef.current.width, canvasRef.current.height)
 
-    if (results.poseLandmarks) drawEstimatedPose(canvasCtx, results)
+    if (poseDetected(results)) drawEstimatedPose(canvasCtx, results)
 
     function processTraining(results: Results) {
       goToNextLevelFrom(0, idlePose)
@@ -185,7 +185,7 @@ const MPStart = () => {
       }
     }
 
-    if (results.poseLandmarks && (results.rightHandLandmarks || results.leftHandLandmarks)) {
+    if (poseDetected(results)) {
       setWholePoseDetected(true)
       switch (gameMode) {
         case TRAINING_GAME_MODE:
@@ -215,7 +215,9 @@ const MPStart = () => {
       })
     }
 
-    function drawHand(isLeft: boolean) {
+    function drawHand(handLandmarks: NormalizedLandmarkList) {
+      const isLeft = handLandmarks === results.leftHandLandmarks
+
       drawConnectors(canvasCtx, isLeft ? results.leftHandLandmarks : results.rightHandLandmarks, HAND_CONNECTIONS, {
         color: isLeft ? 'rgb(255, 85, 85)' : 'rgb(76, 85, 255)',
         lineWidth: 2.5,
@@ -229,8 +231,12 @@ const MPStart = () => {
     }
 
     drawBody()
-    drawHand(true)
-    drawHand(false)
+    drawHand(results.leftHandLandmarks)
+    drawHand(results.rightHandLandmarks)
+  }
+
+  function poseDetected(results: Results) {
+    return results.poseLandmarks && (results.rightHandLandmarks || results.leftHandLandmarks)
   }
 
   useEffect(registerHolisticResultListener, [cachedOnNewFrame])
