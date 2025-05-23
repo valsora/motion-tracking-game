@@ -26,15 +26,9 @@ export const enginesRunUpPose = ({
   const elbowL = poseLandmarks[POSE_LANDMARKS.LEFT_ELBOW]
   const wristL = poseLandmarks[POSE_LANDMARKS.LEFT_WRIST]
 
-  const indexFinger =
-    indexTipR.y < indexDipR.y &&
-    indexDipR.y < indexPipR.y &&
-    indexPipR.y < indexMcpR.y
+  const indexFinger = indexTipR.y < indexDipR.y && indexDipR.y < indexPipR.y && indexPipR.y < indexMcpR.y
 
-  const middleFinger =
-    middleTipR.y < middleDipR.y &&
-    middleDipR.y < middlePipR.y &&
-    middlePipR.y < middleMcpR.y
+  const middleFinger = middleTipR.y < middleDipR.y && middleDipR.y < middlePipR.y && middlePipR.y < middleMcpR.y
 
   const rightSide =
     wristR.y < nose.y &&

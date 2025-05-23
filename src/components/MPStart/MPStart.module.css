@@ -7,7 +7,7 @@
 .message {
   text-align: center;
   font-size: 32px;
-  font-weight: 500;
+  font-weight: 400;
 }
 
 .canvas {
@@ -16,6 +16,10 @@
   transform: scaleX(-1);
 }
 
-.image {
-  height: 480px;
+.mpstart > button {
+  margin-bottom: 4px;
+}
+
+.canvasAndImage{
+  height: 484px;
 }

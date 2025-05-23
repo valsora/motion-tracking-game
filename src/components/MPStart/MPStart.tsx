@@ -5,35 +5,17 @@ import { Holistic, Results, POSE_CONNECTIONS, HAND_CONNECTIONS, NormalizedLandma
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils'
 import { Camera } from '@mediapipe/camera_utils'
 
+import Button from '@mui/material/Button'
+
 import styles from './MPStart.module.css'
 
 import PoseImage from '@components/PoseImage/PoseImage'
 
-import {
-  idlePose,
-  removeTiedownsPose1,
-  removeTiedownsPose2,
-  removeTiedownsPose3,
-  removeTiedownsPose4,
-  tiedownsRemovedPose1,
-  tiedownsRemovedPose2,
-  tiedownsRemovedPose3,
-  tiedownsRemovedPose4,
-  wheelChocksRemovedPose,
-  moveAheadPose,
-  turnRightPose,
-  turnLeftPose,
-  stopPose,
-  unfoldWingsPose1,
-  unfoldWingsPose2,
-  launchBarPose1,
-  launchBarPose2,
-  enginesRunUpPose,
-  launchPose,
-} from '@/pose_predicates'
+import { stagesData } from '@/entities/stages/model/stagesData'
 
-import { TRAINING_GAME_MODE, NOT_TRAINING_GAME_MODE, changeGameMode } from '@store/slices/gameLogicSlice'
-import { toNextLevel, restart, levelsData } from '@store/slices/trainingModeSlice'
+import { TRAINING_GAME_MODE, EXAMINATION_GAME_MODE, changeGameMode } from '@store/slices/gameLogicSlice'
+import { toNextLevel, restartTraining } from '@store/slices/trainingModeSlice'
+import { toNextQuestion, restartExamination } from '@/store/slices/examinationModeSlice'
 import { useStoreDispatch, useStoreSelector } from '@store/hooks'
 
 const MPStart = () => {
@@ -48,11 +30,7 @@ const MPStart = () => {
 
   const { level, trainingMessage } = useStoreSelector((state) => state.trainingMode)
 
-  const notTrainingRef = useRef<{
-    pose: string | null
-    count: number
-  }>({ pose: null, count: 0 })
-  const [notTrainingMessage, setNotTrainingMessage] = useState('unknown')
+  const { question, examinationMessage } = useStoreSelector((state) => state.examinationMode)
 
   const holisticRef = useRef<Holistic | null>(null)
   const cameraRef = useRef<Camera | null>(null)
@@ -98,7 +76,7 @@ const MPStart = () => {
     holisticRef.current?.onResults(cachedOnNewFrame)
   }
 
-  const cachedOnNewFrame = useCallback(onNewFrame, [dispatch, gameMode, level])
+  const cachedOnNewFrame = useCallback(onNewFrame, [dispatch, gameMode, level, question])
 
   function onNewFrame(results: Results) {
     if (!canvasRef.current || !webcamRef.current?.video) return
@@ -118,38 +96,24 @@ const MPStart = () => {
     if (bodyDetected(results)) drawEstimatedPose(canvasCtx, results)
 
     function proceedTraining() {
-      function nextLevelIfPoseAtLevel(atLevel: number, poseDetected: (results: Results) => boolean) {
-        if (level === atLevel && poseDetected(results)) dispatch(toNextLevel())
-      }
-
-      levelsData.forEach((levelData) => {
-        if (levelData[3]) nextLevelIfPoseAtLevel(levelData[0], levelData[3])
+      gameData.forEach(([index, , , , posePredicate]) => {
+        if (posePredicate && level === index && posePredicate(results)) dispatch(toNextLevel())
       })
     }
 
-    function processNotTraining() {
-      function processPose(results: Results, poseName: string, posePredicate: (results: Results) => boolean): boolean {
-        if (posePredicate(results)) {
-          if (notTrainingRef.current.pose === poseName) notTrainingRef.current.count += 1
-          else notTrainingRef.current.count = 0
-          notTrainingRef.current.pose = poseName
-          console.log(`${poseName} ${notTrainingRef.current.count}`)
-          return true
-        }
-        return false
-      }
+    function proceedExamination() {
+      gameData.forEach(([index, , , , posePredicate]) => {
+        if (posePredicate && question === index && posePredicate(results)) dispatch(toNextQuestion())
+      })
+    }
 
-      processPose(results, 'idle', idlePose)
-      const unfoldWingsIsDetected = processPose(results, 'wheelChocksRemoved', wheelChocksRemovedPose)
-      if (!unfoldWingsIsDetected) {
-        processPose(results, 'moveAhead', moveAheadPose)
-      }
+    function proceedTrainingOrExamination(isTraining: boolean): void {
+      const stage = isTraining ? level : question
+      const actionCreator = isTraining ? toNextLevel : toNextQuestion
 
-      if (notTrainingRef.current.count >= 20) {
-        console.log('aaaaa eto ' + notTrainingRef.current.pose)
-        notTrainingRef.current.count = 0
-        if (notTrainingRef.current.pose) setNotTrainingMessage(notTrainingRef.current.pose)
-      }
+      stagesData.forEach(({ index, posePredicate }) => {
+        if (posePredicate && stage === index && posePredicate(results)) dispatch(actionCreator())
+      })
     }
 
     if (bodyDetected(results) && atLeastOneHandDetected(results)) {
@@ -159,9 +123,13 @@ const MPStart = () => {
         case TRAINING_GAME_MODE:
           proceedTraining()
           break
-        case NOT_TRAINING_GAME_MODE:
-          processNotTraining()
+        case EXAMINATION_GAME_MODE:
+          proceedExamination()
           break
+        default: {
+          const exhaustiveCheck: never = gameMode
+          throw new Error(`Unhandled cases: ${exhaustiveCheck}`)
+        }
       }
     } else {
       setWholePoseDetected(false)
@@ -222,22 +190,28 @@ const MPStart = () => {
   }
 
   const handleRestartButtonClick = () => {
-    dispatch(restart())
+    if (gameMode === TRAINING_GAME_MODE) {
+      dispatch(restartTraining())
+    } else {
+      dispatch(restartExamination())
+    }
   }
 
   return (
     <div className={styles.mpstart}>
       <h1>{gameMode}</h1>
-      <button onClick={handleGameModeButtonClick}>another game mode</button>
-      <p className={styles.message}>{gameMode === TRAINING_GAME_MODE ? trainingMessage : notTrainingMessage}</p>
-      {gameMode === TRAINING_GAME_MODE && <button onClick={handleRestartButtonClick}>RESTART</button>}
+      <Button variant="contained" size="large" onClick={handleGameModeButtonClick}>
+        change game mode
+      </Button>
+      <p className={styles.message}>{gameMode === TRAINING_GAME_MODE ? trainingMessage : examinationMessage}</p>
+      <Button variant="contained" size="small" onClick={handleRestartButtonClick}>
+        restart
+      </Button>
       <div className={styles.canvasAndImage}>
         <canvas
           className={styles.canvas}
           style={{
-            boxShadow: wholePoseDetected
-              ? '0px 0px 20px 5px rgba(13, 232, 31, 0.5)'
-              : '0px 0px 20px 5px rgba(255, 50, 50, 0.5)',
+            boxShadow: wholePoseDetected ? '0px 0px 20px 5px rgba(13, 232, 31, 0.5)' : '0px 0px 20px 5px rgba(255, 50, 50, 0.5)',
           }}
           ref={canvasRef}
         >

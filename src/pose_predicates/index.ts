@@ -1,16 +1,8 @@
+export type { PosePredicateType } from './PosePredicateType'
+
 export { idlePose } from './idlePose'
-export {
-  removeTiedownsPose1,
-  removeTiedownsPose2,
-  removeTiedownsPose3,
-  removeTiedownsPose4,
-} from './removeTiedownsPoses'
-export {
-  tiedownsRemovedPose1,
-  tiedownsRemovedPose2,
-  tiedownsRemovedPose3,
-  tiedownsRemovedPose4,
-} from './tiedownsRemovedPoses'
+export { removeTiedownsPose1, removeTiedownsPose2, removeTiedownsPose3, removeTiedownsPose4 } from './removeTiedownsPoses'
+export { tiedownsRemovedPose1, tiedownsRemovedPose2, tiedownsRemovedPose3, tiedownsRemovedPose4 } from './tiedownsRemovedPoses'
 export { wheelChocksRemovedPose } from './wheelChocksRemovedPose'
 export { moveAheadPose } from './moveAheadPose'
 export { turnRightPose } from './turnRightPose'

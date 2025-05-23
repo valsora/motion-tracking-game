@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
 
-export const TRAINING_GAME_MODE = 'Training mode'
-export const NOT_TRAINING_GAME_MODE = 'Not training mode' //придумать позже
+export const TRAINING_GAME_MODE = 'Training Mode'
+export const EXAMINATION_GAME_MODE = 'Examination Mode'
 
 interface GameLogicState {
-  gameMode: typeof TRAINING_GAME_MODE | typeof NOT_TRAINING_GAME_MODE
+  gameMode: typeof TRAINING_GAME_MODE | typeof EXAMINATION_GAME_MODE
 }
 
 const initialState: GameLogicState = {
@@ -18,13 +18,15 @@ export const gameLogicSlice = createSlice({
     changeGameMode: (state) => {
       switch (state.gameMode) {
         case TRAINING_GAME_MODE:
-          state.gameMode = NOT_TRAINING_GAME_MODE
+          state.gameMode = EXAMINATION_GAME_MODE
           break
-        case NOT_TRAINING_GAME_MODE:
+        case EXAMINATION_GAME_MODE:
           state.gameMode = TRAINING_GAME_MODE
           break
-        default:
-          break
+        default: {
+          const exhaustiveCheck: never = state.gameMode
+          throw new Error(`Unhandled cases: ${exhaustiveCheck}`)
+        }
       }
     },
   },

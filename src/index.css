@@ -18,13 +18,17 @@ body {
 
 #root {
   min-height: 100vh;
+  background-image: radial-gradient(#0a233b, #090814);
 }
 
 h1 {
   margin: 0;
-  font-size: 40px;
+  margin-bottom: 16px;
+  font-size: 48px;
+  font-weight: 600;
 }
 
 p {
   margin: 0;
+  margin-bottom: 8px;
 }
