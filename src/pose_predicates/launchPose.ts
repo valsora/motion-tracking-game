@@ -1,14 +1,9 @@
-import { POSE_LANDMARKS, Results } from '@mediapipe/holistic'
-import areCoordsClose from './areCoordsClose'
+import { POSE_LANDMARKS } from '@mediapipe/holistic'
 
-export const launchPose = ({
-  poseLandmarks,
-  rightHandLandmarks,
-  leftHandLandmarks,
-}: Pick<
-  Results,
-  'poseLandmarks' | 'rightHandLandmarks' | 'leftHandLandmarks'
->): boolean => {
+import areCoordsClose from './areCoordsClose'
+import type { PosePredicateType } from './PosePredicateType'
+
+export const launchPose: PosePredicateType = ({ poseLandmarks, rightHandLandmarks, leftHandLandmarks }) => {
   if (!leftHandLandmarks) return false
 
   const shoulderR = poseLandmarks[POSE_LANDMARKS.RIGHT_SHOULDER]
@@ -33,25 +28,15 @@ export const launchPose = ({
   const pinkyTipL = leftHandLandmarks[20]
   const pinkyMcpL = leftHandLandmarks[17]
 
-  const indexFinger =
-    indexTipL.x > indexDipL.x &&
-    indexDipL.x > indexPipL.x &&
-    indexPipL.x > indexMcpL.x
+  const indexFinger = indexTipL.x > indexDipL.x && indexDipL.x > indexPipL.x && indexPipL.x > indexMcpL.x
 
-  const middleFinger =
-    middleTipL.x > middleDipL.x &&
-    middleDipL.x > middlePipL.x &&
-    middlePipL.x > middleMcpL.x
+  const middleFinger = middleTipL.x > middleDipL.x && middleDipL.x > middlePipL.x && middlePipL.x > middleMcpL.x
 
   const otherFingers = ringMcpL.x > ringTipL.x && pinkyMcpL.x > pinkyTipL.x
 
-  const handOnHorizLine =
-    areCoordsClose(shoulderL.y, elbowL.y) &&
-    areCoordsClose(elbowL.y, wristL.y) &&
-    areCoordsClose(wristL.y, indexTipL.y)
+  const handOnHorizLine = areCoordsClose(shoulderL.y, elbowL.y) && areCoordsClose(elbowL.y, wristL.y) && areCoordsClose(wristL.y, indexTipL.y)
 
-  const handOrderOnXAxis =
-    indexTipL.x > wristL.x && wristL.x > elbowL.x && elbowL.x > shoulderL.x
+  const handOrderOnXAxis = indexTipL.x > wristL.x && wristL.x > elbowL.x && elbowL.x > shoulderL.x
 
   const floorHorizLine = areCoordsClose(heelL.y, kneeR.y)
 

@@ -1,9 +1,8 @@
-import { POSE_LANDMARKS, Results } from '@mediapipe/holistic'
+import { POSE_LANDMARKS } from '@mediapipe/holistic'
 
-export const enginesRunUpPose = ({
-  poseLandmarks,
-  rightHandLandmarks,
-}: Pick<Results, 'poseLandmarks' | 'rightHandLandmarks'>): boolean => {
+import type { PosePredicateType } from './PosePredicateType'
+
+export const enginesRunUpPose: PosePredicateType = ({ poseLandmarks, rightHandLandmarks }) => {
   if (!rightHandLandmarks) return false
 
   const nose = poseLandmarks[POSE_LANDMARKS.NOSE]
@@ -30,13 +29,7 @@ export const enginesRunUpPose = ({
 
   const middleFinger = middleTipR.y < middleDipR.y && middleDipR.y < middlePipR.y && middlePipR.y < middleMcpR.y
 
-  const rightSide =
-    wristR.y < nose.y &&
-    nose.x > wristR.x &&
-    indexFinger &&
-    middleFinger &&
-    ringMcpR.y < ringTipR.y &&
-    pinkyMcpR.y < pinkyTipR.y
+  const rightSide = wristR.y < nose.y && nose.x > wristR.x && indexFinger && middleFinger && ringMcpR.y < ringTipR.y && pinkyMcpR.y < pinkyTipR.y
 
   const leftSide = wristL.y > elbowL.y && elbowL.y > shoulderL.y
 

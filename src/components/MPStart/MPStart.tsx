@@ -5,7 +5,7 @@ import { Holistic, Results, POSE_CONNECTIONS, HAND_CONNECTIONS, NormalizedLandma
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils'
 import { Camera } from '@mediapipe/camera_utils'
 
-import Button from '@mui/material/Button'
+import { Button, CircularProgress } from '@mui/material'
 
 import styles from './MPStart.module.css'
 
@@ -95,18 +95,6 @@ const MPStart = () => {
 
     if (bodyDetected(results)) drawEstimatedPose(canvasCtx, results)
 
-    function proceedTraining() {
-      gameData.forEach(([index, , , , posePredicate]) => {
-        if (posePredicate && level === index && posePredicate(results)) dispatch(toNextLevel())
-      })
-    }
-
-    function proceedExamination() {
-      gameData.forEach(([index, , , , posePredicate]) => {
-        if (posePredicate && question === index && posePredicate(results)) dispatch(toNextQuestion())
-      })
-    }
-
     function proceedTrainingOrExamination(isTraining: boolean): void {
       const stage = isTraining ? level : question
       const actionCreator = isTraining ? toNextLevel : toNextQuestion
@@ -121,10 +109,10 @@ const MPStart = () => {
 
       switch (gameMode) {
         case TRAINING_GAME_MODE:
-          proceedTraining()
+          proceedTrainingOrExamination(true)
           break
         case EXAMINATION_GAME_MODE:
-          proceedExamination()
+          proceedTrainingOrExamination(false)
           break
         default: {
           const exhaustiveCheck: never = gameMode
@@ -203,7 +191,10 @@ const MPStart = () => {
       <Button variant="contained" size="large" onClick={handleGameModeButtonClick}>
         change game mode
       </Button>
-      <p className={styles.message}>{gameMode === TRAINING_GAME_MODE ? trainingMessage : examinationMessage}</p>
+      <div className={styles.messageBox}>
+        <p>{gameMode === TRAINING_GAME_MODE ? trainingMessage : examinationMessage}</p>
+        <CircularProgress size="3rem" variant="determinate" value={stagesData[gameMode === TRAINING_GAME_MODE ? level : question].stageProgress} />
+      </div>
       <Button variant="contained" size="small" onClick={handleRestartButtonClick}>
         restart
       </Button>

@@ -1,10 +1,9 @@
-import { POSE_LANDMARKS, Results } from '@mediapipe/holistic'
+import { POSE_LANDMARKS } from '@mediapipe/holistic'
 
 import areCoordsClose from './areCoordsClose'
+import type { PosePredicateType } from './PosePredicateType'
 
-export const turnRightPose = ({
-  poseLandmarks,
-}: Pick<Results, 'poseLandmarks'>): boolean => {
+export const turnRightPose: PosePredicateType = ({ poseLandmarks }) => {
   const nose = poseLandmarks[POSE_LANDMARKS.NOSE]
 
   const shoulderR = poseLandmarks[POSE_LANDMARKS.RIGHT_SHOULDER]
@@ -17,8 +16,7 @@ export const turnRightPose = ({
 
   const rightSide = wristR.y < nose.y && shoulderR.y >= elbowR.y
 
-  const leftSide =
-    areCoordsClose(wristL.y, elbowL.y) && areCoordsClose(shoulderL.y, elbowL.y)
+  const leftSide = areCoordsClose(wristL.y, elbowL.y) && areCoordsClose(shoulderL.y, elbowL.y)
 
   return rightSide && leftSide
 }

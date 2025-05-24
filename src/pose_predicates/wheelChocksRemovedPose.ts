@@ -1,15 +1,9 @@
-import { POSE_LANDMARKS, Results } from '@mediapipe/holistic'
+import { POSE_LANDMARKS } from '@mediapipe/holistic'
 
 import areCoordClose from './areCoordsClose'
+import type { PosePredicateType } from './PosePredicateType'
 
-export const wheelChocksRemovedPose = ({
-  poseLandmarks,
-  rightHandLandmarks,
-  leftHandLandmarks,
-}: Pick<
-  Results,
-  'poseLandmarks' | 'rightHandLandmarks' | 'leftHandLandmarks'
->): boolean => {
+export const wheelChocksRemovedPose: PosePredicateType = ({ poseLandmarks, rightHandLandmarks, leftHandLandmarks }) => {
   if (!rightHandLandmarks || !leftHandLandmarks) return false
 
   const nose = poseLandmarks[POSE_LANDMARKS.NOSE]

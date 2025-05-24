@@ -1,8 +1,8 @@
-import { POSE_LANDMARKS, Results } from '@mediapipe/holistic'
+import { POSE_LANDMARKS } from '@mediapipe/holistic'
 
-export const moveAheadPose = ({
-  poseLandmarks,
-}: Pick<Results, 'poseLandmarks'>): boolean => {
+import type { PosePredicateType } from './PosePredicateType'
+
+export const moveAheadPose: PosePredicateType = ({ poseLandmarks }) => {
   const nose = poseLandmarks[POSE_LANDMARKS.NOSE]
 
   const shoulderR = poseLandmarks[POSE_LANDMARKS.RIGHT_SHOULDER]

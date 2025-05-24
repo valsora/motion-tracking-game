@@ -48,6 +48,7 @@ interface Stage {
   examinationMessage: string
   posePredicate: PosePredicateType | null
   poseImage: string
+  stageProgress: number
 }
 
 class IdlePoseStage implements Stage {
@@ -56,11 +57,13 @@ class IdlePoseStage implements Stage {
   examinationMessage: string
   posePredicate: PosePredicateType | null = idlePose
   poseImage: string = idleImage
+  stageProgress: number
 
-  constructor(index: number, trainingMessage: string = 'go to next level', examinationMessage: string = 'go to next question') {
+  constructor(index: number, trainingMessage: string = 'go to next level', examinationMessage: string = 'go to next question', stageProgress: number = 100) {
     this.index = index
     this.trainingMessage = ADOPT_IDLE_POSE_LINE + trainingMessage
     this.examinationMessage = ADOPT_IDLE_POSE_LINE + examinationMessage
+    this.stageProgress = stageProgress
   }
 }
 
@@ -70,28 +73,31 @@ class OtherPosesStage implements Stage {
   examinationMessage: string
   posePredicate: PosePredicateType | null
   poseImage: string
+  stageProgress: number
 
-  constructor(index: number, stageNumber: string, poseName: string, posePredicate: PosePredicateType, poseImage: string) {
-    this.index = index
+  constructor(index: number, stageNumber: string, poseName: string, posePredicate: PosePredicateType, poseImage: string, stageProgress: number = 0) {
     const message = `Show "${poseName}" signal`
+
+    this.index = index
     this.trainingMessage = stageNumber + ' ' + message
     this.examinationMessage = message
     this.posePredicate = posePredicate
     this.poseImage = poseImage
+    this.stageProgress = stageProgress
   }
 }
 
 export const stagesData: Array<Stage> = [
   new IdlePoseStage(0, 'start training', 'start examination'),
   new OtherPosesStage(1, '1.1.', 'remove tiedowns', removeTiedownsPose1, removeTiedownsImage),
-  new OtherPosesStage(2, '1.2.', 'remove tiedowns', removeTiedownsPose2, removeTiedownsImage),
-  new OtherPosesStage(3, '1.3.', 'remove tiedowns', removeTiedownsPose3, removeTiedownsImage),
-  new OtherPosesStage(4, '1.4.', 'remove tiedowns', removeTiedownsPose4, removeTiedownsImage),
+  new OtherPosesStage(2, '1.2.', 'remove tiedowns', removeTiedownsPose2, removeTiedownsImage, 25),
+  new OtherPosesStage(3, '1.3.', 'remove tiedowns', removeTiedownsPose3, removeTiedownsImage, 50),
+  new OtherPosesStage(4, '1.4.', 'remove tiedowns', removeTiedownsPose4, removeTiedownsImage, 75),
   new IdlePoseStage(5),
   new OtherPosesStage(6, '2.1.', 'tiedowns removed', tiedownsRemovedPose1, tiedownsRemoved1Image),
-  new OtherPosesStage(7, '2.2.', 'tiedowns removed', tiedownsRemovedPose2, tiedownsRemoved2Image),
-  new OtherPosesStage(8, '2.3.', 'tiedowns removed', tiedownsRemovedPose3, tiedownsRemoved3Image),
-  new OtherPosesStage(9, '2.4.', 'tiedowns removed', tiedownsRemovedPose4, tiedownsRemoved4Image),
+  new OtherPosesStage(7, '2.2.', 'tiedowns removed', tiedownsRemovedPose2, tiedownsRemoved2Image, 25),
+  new OtherPosesStage(8, '2.3.', 'tiedowns removed', tiedownsRemovedPose3, tiedownsRemoved3Image, 50),
+  new OtherPosesStage(9, '2.4.', 'tiedowns removed', tiedownsRemovedPose4, tiedownsRemoved4Image, 75),
   new IdlePoseStage(10),
   new OtherPosesStage(11, '3.', 'wheel chocks removed', wheelChocksRemovedPose, wheelChocksRemovedImage),
   new IdlePoseStage(12),
@@ -104,13 +110,13 @@ export const stagesData: Array<Stage> = [
   new OtherPosesStage(19, '7.', 'stop', stopPose, stopImage),
   new IdlePoseStage(20),
   new OtherPosesStage(21, '8.1.', 'unfold wings', unfoldWingsPose1, unfoldWings1Image),
-  new OtherPosesStage(22, '8.2.', 'unfold wings', unfoldWingsPose2, unfoldWings2Image),
+  new OtherPosesStage(22, '8.2.', 'unfold wings', unfoldWingsPose2, unfoldWings2Image, 50),
   new IdlePoseStage(23),
   new OtherPosesStage(24, '9.1.', 'extend launch bar', launchBarPose1, launchBar1Image),
-  new OtherPosesStage(25, '9.2.', 'extend launch bar', launchBarPose2, launchBar2Image),
+  new OtherPosesStage(25, '9.2.', 'extend launch bar', launchBarPose2, launchBar2Image, 50),
   new IdlePoseStage(26),
   new OtherPosesStage(27, '10.1.', 'retract launch bar', launchBarPose2, launchBar2Image),
-  new OtherPosesStage(28, '10.2.', 'retract launch bar', launchBarPose1, launchBar1Image),
+  new OtherPosesStage(28, '10.2.', 'retract launch bar', launchBarPose1, launchBar1Image, 50),
   new IdlePoseStage(29),
   new OtherPosesStage(30, '11.', 'engines run-up', enginesRunUpPose, enginesRunUpImage),
   new IdlePoseStage(31),
@@ -122,5 +128,6 @@ export const stagesData: Array<Stage> = [
     examinationMessage: 'Examination' + CONGRATS_LINE,
     posePredicate: null,
     poseImage: idleImage,
+    stageProgress: 100,
   },
 ]

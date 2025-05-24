@@ -1,13 +1,8 @@
-import { POSE_LANDMARKS, Results } from '@mediapipe/holistic'
+import { POSE_LANDMARKS } from '@mediapipe/holistic'
 
-export const stopPose = ({
-  poseLandmarks,
-  rightHandLandmarks,
-  leftHandLandmarks,
-}: Pick<
-  Results,
-  'poseLandmarks' | 'rightHandLandmarks' | 'leftHandLandmarks'
->): boolean => {
+import type { PosePredicateType } from './PosePredicateType'
+
+export const stopPose: PosePredicateType = ({ poseLandmarks, rightHandLandmarks, leftHandLandmarks }) => {
   if (!rightHandLandmarks || !leftHandLandmarks) return false
 
   const nose = poseLandmarks[POSE_LANDMARKS.NOSE]
@@ -40,17 +35,9 @@ export const stopPose = ({
 
   const leftSideArm = wristL.y < nose.y && shoulderL.y >= elbowL.y
 
-  const rightFist =
-    indexMcpR.y < indexTipR.y &&
-    middleMcpR.y < middleTipR.y &&
-    ringMcpR.y < ringTipR.y &&
-    pinkyMcpR.y < pinkyTipR.y
+  const rightFist = indexMcpR.y < indexTipR.y && middleMcpR.y < middleTipR.y && ringMcpR.y < ringTipR.y && pinkyMcpR.y < pinkyTipR.y
 
-  const leftFist =
-    indexMcpL.y < indexTipL.y &&
-    middleMcpL.y < middleTipL.y &&
-    ringMcpL.y < ringTipL.y &&
-    pinkyMcpL.y < pinkyTipL.y
+  const leftFist = indexMcpL.y < indexTipL.y && middleMcpL.y < middleTipL.y && ringMcpL.y < ringTipL.y && pinkyMcpL.y < pinkyTipL.y
 
   return rightSideArm && leftSideArm && rightFist && leftFist
 }

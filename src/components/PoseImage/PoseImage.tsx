@@ -1,10 +1,10 @@
 import { useStoreSelector } from '@store/hooks'
-import { gameData } from '@store/slices/trainingModeSlice'
+import { stagesData } from '@/entities/stages/model/stagesData'
 
 const PoseImage = () => {
   const level = useStoreSelector((state) => state.trainingMode.level)
 
-  return <img src={gameData[level][3]} alt="pose" style={{ height: '480px' }} />
+  return <img src={stagesData[level].poseImage} alt="pose" style={{ height: '480px' }} />
 }
 
 export default PoseImage
