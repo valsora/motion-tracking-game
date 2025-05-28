@@ -22,14 +22,15 @@ const MPStart = () => {
   const webcamRef = useRef<Webcam>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
+  const divRef = useRef<HTMLDivElement>(null)
+
   const [wholePoseDetected, setWholePoseDetected] = useState(false)
+  const [webcamIsReady, setWebcamIsReady] = useState(false)
 
   const dispatch = useStoreDispatch()
 
   const gameMode = useStoreSelector((state) => state.gameLogic.gameMode)
-
   const { level, trainingMessage } = useStoreSelector((state) => state.trainingMode)
-
   const { question, examinationMessage } = useStoreSelector((state) => state.examinationMode)
 
   const holisticRef = useRef<Holistic | null>(null)
@@ -85,6 +86,9 @@ const MPStart = () => {
     const videoH = webcamRef.current.video.videoHeight
     canvasRef.current.width = videoW
     canvasRef.current.height = videoH
+
+    divRef.current!.style.height = `${videoH}px`
+    setWebcamIsReady(true)
 
     const canvasCtx = canvasRef.current.getContext('2d')
     if (!canvasCtx) return
@@ -191,14 +195,14 @@ const MPStart = () => {
       <Button variant="contained" size="large" onClick={handleGameModeButtonClick}>
         change game mode
       </Button>
-      <div className={styles.messageBox}>
+      <div className={styles.messageContainer}>
         <p>{gameMode === TRAINING_GAME_MODE ? trainingMessage : examinationMessage}</p>
         <CircularProgress size="3rem" variant="determinate" value={stagesData[gameMode === TRAINING_GAME_MODE ? level : question].stageProgress} />
       </div>
       <Button variant="contained" size="small" onClick={handleRestartButtonClick}>
         restart
       </Button>
-      <div className={styles.canvasAndImage}>
+      <div ref={divRef}>
         <canvas
           className={styles.canvas}
           style={{
@@ -208,7 +212,7 @@ const MPStart = () => {
         >
           <Webcam audio={false} ref={webcamRef} />
         </canvas>
-        {gameMode === TRAINING_GAME_MODE && <PoseImage />}
+        {webcamIsReady && gameMode === TRAINING_GAME_MODE && <PoseImage />}
       </div>
     </div>
   )

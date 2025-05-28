@@ -4,7 +4,7 @@
   align-items: center;
 }
 
-.messageBox {
+.messageContainer {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -12,22 +12,16 @@
   gap: 1rem;
 }
 
-.messageBox > p {
+.messageContainer > p {
   text-align: center;
   font-size: 2rem;
   font-weight: 400;
 }
 
 .canvas {
-  width: 640px;
-  height: 480px;
   transform: scaleX(-1);
 }
 
 .mpstart > button {
-  margin-bottom: 4px;
-}
-
-.canvasAndImage{
-  height: 484px;
+  margin-bottom: 8px;
 }
